@@ -17,7 +17,6 @@ from .permissions import IsAdmin, ProfessionalsPermissions
 # import ipdb
 
 
-
 class LoginUserView(APIView):
     def post(self, request):
         serializer = LoginUserSerializer(data=request.data)
@@ -51,6 +50,15 @@ class PatientByIdView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdmin]
 
     lookup_url_kwarg = "patient_id"
+
+    def delete(self, request, patient_id=''):
+        patient = Patient.objects.filter(cpf=patient_id)
+        user = User.objects.get(patient__in=patient)
+
+        patient.delete()
+        user.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ProfessionalsView(APIView):
