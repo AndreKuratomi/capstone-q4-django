@@ -4,7 +4,7 @@ from .models import Professional, User
 
 class IsAdmin(BasePermission):
     def has_permission(self, request, view):
-        if request.method == "POST":
+        if request.method == "POST" or request.method == "GET":
             return True
 
         return bool(request.user.is_authenticated and request.user.is_admin)
