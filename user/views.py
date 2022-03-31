@@ -15,7 +15,7 @@ from .serializers import AdminSerializer, LoginUserSerializer, PatientIdSerializ
 from .permissions import IsAdmin, ProfessionalsPermissions
 
 # import ipdb
-# import pywhatkit
+
 
 
 class LoginUserView(APIView):
