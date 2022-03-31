@@ -5,6 +5,7 @@ from .views import (
     SpecificAppointmentView,
     SpecificProfessionalView,
     NotFinishedAppointmentView,
+    TomorrowAppointmentView,
 )
 
 urlpatterns = [
@@ -12,5 +13,6 @@ urlpatterns = [
     path("appointments/open/", NotFinishedAppointmentView.as_view()),
     path('appointments/professional/<str:council_number>/', SpecificProfessionalView.as_view()),
     path('appointments/patient/<str:cpf>/', SpecificPatientView.as_view()),
-    path('appointments/<str:appointment_id>/', SpecificAppointmentView.as_view())
+    path('appointments/<str:appointment_id>/', SpecificAppointmentView.as_view()),
+    path('appointments/tomorrow/<str:council_number>', TomorrowAppointmentView.as_view())
 ]

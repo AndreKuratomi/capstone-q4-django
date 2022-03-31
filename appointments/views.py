@@ -93,7 +93,7 @@ class SpecificAppointmentView(APIView):
     def patch(self, request, appointment_id=''):
         try:
             appointment = AppointmentsModel.objects.get(uuid=appointment_id)
-            # user = User.objects.get(professional=professional)
+
             if appointment:
                 serialized = AppointmentsToUpdateSerializer(data=request.data, partial=True)
 
@@ -125,6 +125,36 @@ class SpecificAppointmentView(APIView):
 
         except AppointmentsModel.DoesNotExist:
             return Response({'message': 'Appointment does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class TomorrowAppointmentView(APIView):
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [AppointmentPermission]
+
+    def get(self, request, council_number=''):
+        try:
+            professional = Professional.objects.get(council_number=council_number)
+
+            if professional:
+                now = datetime.now()
+                tomorrow = datetime.now().date() + timedelta(days=1)
+                end_tomorrow = tomorrow + timedelta(days=1)
+                appointments_for_tomorrow = AppointmentsModel.objects.filter(date__range=[tomorrow, end_tomorrow])
+
+                # ipdb.set_trace()
+                if appointments_for_tomorrow:
+                    for unfinished in appointments_for_tomorrow:
+                        serializer = AppointmentsSerializer(unfinished)
+
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                return Response({"message": "No appointments for tomorrow!"}, status=status.HTTP_200_OK)
+
+        except Professional.DoesNotExist:
+            return Response({"message": "Professional not registered"}, status=status.HTTP_404_NOT_FOUND)
+
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class NotFinishedAppointmentView(APIView):

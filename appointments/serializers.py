@@ -31,5 +31,5 @@ class AppointmentsToUpdateSerializer(serializers.Serializer):
     date = serializers.DateTimeField(required=False)
     complaint = serializers.CharField(required=False)
     finished = serializers.BooleanField(required=False)
-    patient = serializers.CharField()
-    professional = serializers.CharField()
+    # patient = serializers.CharField()
+    # professional = serializers.CharField()

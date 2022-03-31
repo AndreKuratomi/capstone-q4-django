@@ -86,7 +86,6 @@ class PatientSerializer(serializers.ModelSerializer):
         return new_patient
 
 
-
 class PatientIdSerializer(serializers.ModelSerializer):
     user = UserForPatientSerializer()
 
@@ -102,7 +101,6 @@ class PatientIdSerializer(serializers.ModelSerializer):
         updated_patient = Patient.objects.get(cpf=instance.cpf)
 
         return updated_patient
-
 
 
 class AdminSerializer(serializers.Serializer):
