@@ -1,5 +1,9 @@
-from datetime import date, datetime, timedelta
+from datetime import datetime
+from urllib import response
+from datetime import date, datetime, time, timedelta
+from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
+from time import sleep
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -15,8 +19,12 @@ from .serializers import AllAppointmentsSerializer, AppPatientSerializer, AppPro
 from .permissions import AppointmentPermission
 from user.models import Patient, Professional, User
 from user.serializers import PatientSerializer, ProfessionalSerializer, NewPatientSerializer
+from .serializers import AppointmentsSerializer, AppointmentsToUpdateSerializer
+from .models import AppointmentsModel
+from .permissions import AppointmentPermission
+import pywhatkit
 
-import ipdb
+# import ipdb
 
 
 class SpecificPatientView(APIView):
@@ -155,20 +163,27 @@ class NotFinishedAppointmentView(APIView):
     permission_classes = [AppointmentPermission]
 
     def get(self, request):
-        try:
 
             not_finished_appointment = AppointmentsModel.objects.filter(finished=False)
 
-            for unfinished in not_finished_appointment:
-                serializer = AppointmentsSerializer(unfinished)
+            serialized_not_finished = [
+                {
+                    "uuid": appointment.uuid,
+                    "date": appointment.date,
+                    "patient": "appointment.patient.name",
+                    "professional": appointment.professional.name,
+                    "complaint": appointment.complaint,
+                    "finished": appointment.finished
+                } for appointment in not_finished_appointment
+            ]            
 
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            # serializer = AppointmentsSerializer(serialized_not_finished)
 
-        except ObjectDoesNotExist:
-            return Response(
-                {"message": "Professional not registered"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+            # for unfinished in not_finished_appointment:
+                # serializer = AppointmentsSerializer(unfinished)
+
+
+            return Response(serialized_not_finished, status=status.HTTP_200_OK)
 
 
 class CreateAppointment(APIView):
@@ -195,7 +210,6 @@ class CreateAppointment(APIView):
             data=data
         )
         
-        # print(serializer.validated_data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -203,5 +217,31 @@ class CreateAppointment(APIView):
         serializer.validated_data['patient'] = patient
         appointment = AppointmentsModel.objects.create(**serializer.validated_data)
         serializer = AppointmentsSerializer(appointment)
+        
+        appointment_date = str(appointment.date.day) + "/" + str(appointment.date.month) + "/" + str(appointment.date.year)
+
+        appointment_hour = str(appointment.date.hour) + ":" + str(appointment.date.minute)
+
+        whats_message = f"""
+
+            ✅  *Confirmação de agendamento de consulta*
+            *Paciente:* {patient.name} 
+            *Profissional:* {professional.name} 
+            *Especialidade:* {professional.specialty} 
+            *Data:* {appointment_date} 
+            *Horário:* {appointment_hour} 
+            *Local:* Clínica Kenzie Doc 
+            *Endereço:* R. General Mario Tourinho, 1733
+            *Para reagendar/cancelar a consulta, entre em contato com a Kenzie Doc.* 
+        
+        """
+
+        time_to_send = datetime.now() + timedelta(minutes=1)
+
+        sleep(10)
+
+        pywhatkit.sendwhatmsg(f"+55{patient.phone}", whats_message, time_to_send.hour,time_to_send.minute) 
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    
