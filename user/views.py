@@ -86,7 +86,7 @@ class PatientView(APIView):
 
     def get(self, request):
 
-        patients = Professional.objects.all()
+        patients = Patient.objects.all()
 
         serialized = PatientSerializer(patients, many=True)
 

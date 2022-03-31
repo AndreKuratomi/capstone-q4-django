@@ -3,6 +3,7 @@ from urllib import response
 from datetime import date, datetime, time, timedelta
 from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
+from time import sleep
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -194,7 +195,7 @@ class CreateAppointment(APIView):
         whats_message = f"""
 
             ✅  *Confirmação de agendamento de consulta*
-            *Paciente:* Nome do paciente
+            *Paciente:* {patient.name} 
             *Profissional:* {professional.name} 
             *Especialidade:* {professional.specialty} 
             *Data:* {appointment_date} 
@@ -206,7 +207,10 @@ class CreateAppointment(APIView):
         """
 
         time_to_send = datetime.now() + timedelta(minutes=1)
-        pywhatkit.sendwhatmsg("+5519997416761", whats_message, time_to_send.hour,time_to_send.minute) 
+
+        sleep(10)
+
+        pywhatkit.sendwhatmsg(f"+55{patient.phone}", whats_message, time_to_send.hour,time_to_send.minute) 
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
