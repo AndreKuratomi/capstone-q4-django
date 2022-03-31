@@ -31,10 +31,10 @@ class SpecificPatientView(APIView):
             for appointments in appointment:
                 serializer = AppointmentsSerializer(appointments)
 
-            return response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
         except ObjectDoesNotExist:
-            return response(
+            return Response(
                 {"message": "Patient does not exist"}, status=status.HTTP_404_NOT_FOUND
             )
 
@@ -53,10 +53,10 @@ class SpecificProfessionalView(APIView):
             for appointments in appointment:
                 serializer = AppointmentsSerializer(appointments)
 
-            return response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
         except ObjectDoesNotExist:
-            return response(
+            return Response(
                 {"message": "Professional not registered"},
                 status=status.HTTP_404_NOT_FOUND,
             )
@@ -68,20 +68,27 @@ class NotFinishedAppointmentView(APIView):
     permission_classes = [AppointmentPermission]
 
     def get(self, request):
-        try:
 
             not_finished_appointment = AppointmentsModel.objects.filter(finished=False)
 
-            for unfinished in not_finished_appointment:
-                serializer = AppointmentsSerializer(unfinished)
+            serialized_not_finished = [
+                {
+                    "uuid": appointment.uuid,
+                    "date": appointment.date,
+                    "patient": "appointment.patient.name",
+                    "professional": appointment.professional.name,
+                    "complaint": appointment.complaint,
+                    "finished": appointment.finished
+                } for appointment in not_finished_appointment
+            ]            
 
-            return response(serializer.data, status=status.HTTP_200_OK)
+            # serializer = AppointmentsSerializer(serialized_not_finished)
 
-        except ObjectDoesNotExist:
-            return response(
-                {"message": "Professional not registered"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+            # for unfinished in not_finished_appointment:
+                # serializer = AppointmentsSerializer(unfinished)
+
+
+            return Response(serialized_not_finished, status=status.HTTP_200_OK)
 
 
 class CreateAppointment(APIView):
