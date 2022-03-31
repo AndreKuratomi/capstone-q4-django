@@ -81,10 +81,9 @@ class PatientSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = User.objects.create_user(email=validated_data['user']['email'], password=validated_data['user']['password'])
-        new_patient = Patient.objects.create(user=user, cpf=validated_data['cpf'], age=validated_data['age'], sex=validated_data['sex'])
+        new_patient = Patient.objects.create(user=user, cpf=validated_data['cpf'], age=validated_data['age'], sex=validated_data['sex'], name=validated_data['name'], phone=validated_data['phone'])
 
         return new_patient
-
 
 
 class PatientIdSerializer(serializers.ModelSerializer):
@@ -102,7 +101,6 @@ class PatientIdSerializer(serializers.ModelSerializer):
         updated_patient = Patient.objects.get(cpf=instance.cpf)
 
         return updated_patient
-
 
 
 class AdminSerializer(serializers.Serializer):
