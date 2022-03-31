@@ -9,6 +9,6 @@ urlpatterns = [
     path('patient/', PatientsView.as_view()),
     path('patient/<str:patient_id>/', PatientByIdView.as_view()),
     path('professional/', ProfessionalsView.as_view()),
-    path('professional/specialty/<str:specialty>', ProfessionalsBySpecialtyView.as_view()),
+    path('professional/specialty/<str:specialty>/', ProfessionalsBySpecialtyView.as_view()),
     path('professional/<str:council_number>/', ProfessionalsByIdView.as_view())
 ]
