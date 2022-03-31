@@ -14,7 +14,7 @@ from .models import Patient, Professional, User, Admin
 from .serializers import AdminSerializer, LoginUserSerializer, PatientIdSerializer, PatientSerializer, ProfessionalSerializer
 from .permissions import IsAdmin, ProfessionalsPermissions
 
-import ipdb
+# import ipdb
 
 
 class LoginUserView(APIView):
