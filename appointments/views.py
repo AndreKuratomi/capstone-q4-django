@@ -249,7 +249,7 @@ class CreateAppointment(APIView):
 
         sleep(10)
 
-        send_mail('marcação de consulta', f'Olá, {patient.name}! Sua consulta com o/a Dr./Dra. {professional.name} foi marcada para o dia {date.split(" ")[0]} às {date.split(" ")[1]}', None, [patient.user.email])
+        # send_mail('marcação de consulta', f'Olá, {patient.name}! Sua consulta com o/a Dr./Dra. {professional.name} foi marcada para o dia {date.split(" ")[0]} às {date.split(" ")[1]}', None, [patient.user.email])
 
         pywhatkit.sendwhatmsg(f"+55{patient.phone}", whats_message, time_to_send.hour,time_to_send.minute) 
 
