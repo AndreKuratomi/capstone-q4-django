@@ -1,8 +1,11 @@
-from datetime import datetime
-from urllib import response
-from datetime import date, datetime, time, timedelta
 from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
+from django.core.exceptions import ObjectDoesNotExist
+
+from datetime import datetime
+from datetime import date, datetime, time, timedelta
+from urllib import response
 from time import sleep
 
 from rest_framework.views import APIView
@@ -10,21 +13,21 @@ from rest_framework.response import Response
 from rest_framework import status
 # from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.decorators import authentication_classes, permission_classes
 
+from user.models import Patient, Professional, User
+from user.serializers import PatientSerializer, ProfessionalSerializer, NewPatientSerializer
 from user.views import ProfessionalsByIdView
+
 from .models import AppointmentsModel
 from .serializers import AllAppointmentsSerializer, AppPatientSerializer, AppProfessonalSerializer, AppointmentsSerializer, AppointmentsToUpdateSerializer
 from .permissions import AppointmentPermission
-from user.models import Patient, Professional, User
-from user.serializers import PatientSerializer, ProfessionalSerializer, NewPatientSerializer
 from .serializers import AppointmentsSerializer, AppointmentsToUpdateSerializer
 from .models import AppointmentsModel
 from .permissions import AppointmentPermission
-import pywhatkit
 
-# import ipdb
+import pywhatkit
+import ipdb
 
 
 class SpecificPatientView(APIView):
@@ -145,6 +148,8 @@ class SpecificAppointmentView(APIView):
 
                 appointment.delete()
 
+        # send_mail('marcação de consulta', f'Olá, {patient.user.name}! Sua consulta com o/a Dr./Dra. {professional.user.name} foi marcada para o dia {date.split(" ")[0]} às {date.split(" ")[1]}', None, [patient.user.email])
+
                 return Response(status=status.HTTP_204_NO_CONTENT)
 
         except AppointmentsModel.DoesNotExist:
@@ -220,16 +225,17 @@ class CreateAppointment(APIView):
         data=request.data
 
         prof = ProfessionalSerializer(professional)
-        # pat = NewPatientSerializer(patient)
+        print(prof['council_number'])
         pat = PatientSerializer(patient)
 
         data['professional'] = prof.data["council_number"]
         data['patient'] = pat.data["cpf"]
 
+        date = data['date']
+
         serializer = AppointmentsSerializer(
             data=data
         )
-        
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -237,6 +243,7 @@ class CreateAppointment(APIView):
         serializer.validated_data['patient'] = patient
         appointment = AppointmentsModel.objects.create(**serializer.validated_data)
         serializer = AppointmentsSerializer(appointment)
+        # ipdb.set_trace()
         
         appointment_date = str(appointment.date.day) + "/" + str(appointment.date.month) + "/" + str(appointment.date.year)
 
@@ -260,8 +267,8 @@ class CreateAppointment(APIView):
 
         sleep(10)
 
+        send_mail('marcação de consulta', f'Olá, {patient.name}! Sua consulta com o/a Dr./Dra. {professional.name} foi marcada para o dia {date.split(" ")[0]} às {date.split(" ")[1]}', None, [patient.user.email])
+
         pywhatkit.sendwhatmsg(f"+55{patient.phone}", whats_message, time_to_send.hour,time_to_send.minute) 
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    

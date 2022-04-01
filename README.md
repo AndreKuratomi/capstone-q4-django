@@ -74,7 +74,7 @@ code .
 
 Para ter acesso ao descrições detalhes das rotas e seus retornos, conferir documentação completa no link a seguir:
 
-https://kenziedoc-django-api-documentation.vercel.app/
+https://kenziedoc-django-apidocumentation.vercel.app
 
 # Desenvolvedores da API
 

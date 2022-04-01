@@ -42,56 +42,6 @@ class PatientsView(ListCreateAPIView):
     permission_classes = [IsAdmin]
 
 
-# class PatientView(APIView):
-
-#     authentication_classes = [TokenAuthentication]
-#     permission_classes = [IsAdmin]
-
-#     def post(self, request):
-#         try:
-#             serializer = PatientSerializer(data=request.data)
-#             data = request.data
-
-#             if not serializer.is_valid():
-#                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#             if Patient.objects.filter(cpf=serializer.validated_data['cpf']).exists() == True:
-#                 return Response({"message": "This patient already exists"}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-#             print(data, '*'*100)
-#             user = User.objects.create_user(data['user']['email'], data['user']['password'])
-#             patient = Patient.objects.create(
-#                 user=user, 
-#                 name=request.data['name'],
-#                 cpf=request.data['cpf'],
-#                 phone=request.data['phone'],
-#                 age = request.data['age'],
-#                 sex = request.data['sex']
-#                 )
-
-#             serializer = PatientSerializer(patient)
-
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         except IntegrityError:
-#             return Response({"message": "This patient already exists"}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-
-#     def get(self, request):
-
-#         patients = Patient.objects.all()
-
-#         serialized = PatientSerializer(patients, many=True)
-
-#         return Response(serialized.data, status=status.HTTP_200_OK)
-
-#     def delete(self, request, patient_id=''):
-#         patient = Patient.objects.filter(cpf=patient_id)
-#         user = User.objects.get(patient__in=patient)
-
-#         patient.delete()
-#         user.delete()
-
-#         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 class PatientByIdView(RetrieveUpdateDestroyAPIView):
 
     queryset = Patient.objects.all()
@@ -155,8 +105,9 @@ class ProfessionalsView(APIView):
 class ProfessionalsBySpecialtyView(APIView):
 
     def get(self, request, specialty=''):
+        maxim_param = specialty.capitalize()
 
-        professionals_by_specialty = Professional.objects.filter(specialty=specialty)
+        professionals_by_specialty = Professional.objects.filter(specialty=maxim_param)
 
         serialized = ProfessionalSerializer(professionals_by_specialty, many=True)
 
@@ -190,7 +141,7 @@ class ProfessionalsByIdView(APIView):
         except Professional.DoesNotExist:
             return Response(
                 {'message': 'Professional does not exist'}, status=status.HTTP_404_NOT_FOUND,
-            )        
+            )
 
     def patch(self, request, council_number=''):
 
@@ -203,7 +154,7 @@ class ProfessionalsByIdView(APIView):
                     return Response(
                         {
                             "detail": "You do not have permission to perform this action."
-                        },  
+                        },
                         status=status.HTTP_401_UNAUTHORIZED
                     )
 
@@ -230,7 +181,6 @@ class ProfessionalsByIdView(APIView):
 
         except Professional.DoesNotExist:
             return Response({'message': 'Professional does not exist'}, status=status.HTTP_404_NOT_FOUND)
-    
 
     def delete(self, request, council_number=''):
 
@@ -246,7 +196,7 @@ class ProfessionalsByIdView(APIView):
                         },  
                         status=status.HTTP_401_UNAUTHORIZED
                     )
-                
+
             user.delete()
 
             return Response(status=status.HTTP_204_NO_CONTENT)
