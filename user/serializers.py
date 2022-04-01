@@ -43,7 +43,7 @@ class ProfessionalSerializer(serializers.Serializer):
     council_number = serializers.CharField()
     specialty = serializers.CharField()
     name = serializers.CharField()
-    phone = serializers.CharField()  
+    phone = serializers.CharField()
 
 
 class NewPatientSerializer(serializers.Serializer):
