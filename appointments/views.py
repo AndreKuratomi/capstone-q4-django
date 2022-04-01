@@ -108,6 +108,30 @@ class SpecificAppointmentView(APIView):
                     updated_appointment = AppointmentsModel.objects.get(uuid=appointment_id)
                     serialized = AppointmentsSerializer(updated_appointment)
 
+                    appointment_date = str(appointment.date.day) + "/" + str(appointment.date.month) + "/" + str(appointment.date.year)
+
+                    appointment_hour = str(appointment.date.hour) + ":" + str(appointment.date.minute)
+
+                    whats_message = f"""
+
+                        ⚠️   *Reagendamento de consulta*
+                        *Paciente:* {appointment.patient.name} 
+                        *Profissional:* {appointment.professional.name} 
+                        *Especialidade:* {appointment.professional.specialty} 
+                        *Data:* {appointment_date} 
+                        *Horário:* {appointment_hour} 
+                        *Local:* Clínica Kenzie Doc 
+                        *Endereço:* R. General Mario Tourinho, 1733
+                        *Para reagendar/cancelar a consulta, entre em contato com a Kenzie Doc.* 
+                    
+                    """
+
+                    time_to_send = datetime.now() + timedelta(minutes=1)
+
+                    sleep(10)
+
+                    pywhatkit.sendwhatmsg(f"+55{appointment.patient.phone}", whats_message, time_to_send.hour,time_to_send.minute) 
+
                     return Response(serialized.data, status=status.HTTP_200_OK)
 
         except AppointmentsModel.DoesNotExist:
@@ -175,15 +199,11 @@ class NotFinishedAppointmentView(APIView):
                     "complaint": appointment.complaint,
                     "finished": appointment.finished
                 } for appointment in not_finished_appointment
-            ]            
-
-            # serializer = AppointmentsSerializer(serialized_not_finished)
-
-            # for unfinished in not_finished_appointment:
-                # serializer = AppointmentsSerializer(unfinished)
+            ]  
 
 
             return Response(serialized_not_finished, status=status.HTTP_200_OK)
+
 
 
 class CreateAppointment(APIView):
