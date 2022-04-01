@@ -225,7 +225,7 @@ class CreateAppointment(APIView):
         serializer.validated_data['patient'] = patient
         appointment = AppointmentsModel.objects.create(**serializer.validated_data)
         serializer = AppointmentsSerializer(appointment)
-        ipdb.set_trace()
+        # ipdb.set_trace()
         
         appointment_date = str(appointment.date.day) + "/" + str(appointment.date.month) + "/" + str(appointment.date.year)
 
