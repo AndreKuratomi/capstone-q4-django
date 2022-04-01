@@ -150,6 +150,21 @@ class SpecificAppointmentView(APIView):
 
         # send_mail('marcação de consulta', f'Olá, {patient.user.name}! Sua consulta com o/a Dr./Dra. {professional.user.name} foi marcada para o dia {date.split(" ")[0]} às {date.split(" ")[1]}', None, [patient.user.email])
 
+                whats_message = f"""
+
+                        ❌   *Cancelamento de consulta*
+                        *Paciente:* {appointment.patient.name} 
+                        Informamos o cancelamento da sua consulta com:
+                        *Profissional:* {appointment.professional.name} - {appointment.professional.specialty} 
+                        *-- Kenzie Doc.* 
+                    
+                    """
+
+                time_to_send = datetime.now() + timedelta(minutes=1)
+
+                sleep(10)
+
+                pywhatkit.sendwhatmsg(f"+55{appointment.patient.phone}", whats_message, time_to_send.hour,time_to_send.minute) 
                 return Response(status=status.HTTP_204_NO_CONTENT)
 
         except AppointmentsModel.DoesNotExist:
